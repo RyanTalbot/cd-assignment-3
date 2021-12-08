@@ -73,8 +73,15 @@ public class SocketServer {
         outputToClient.println("Add Car");
     }
 
-    public void sellCar() {
-        outputToClient.println("Selling car");
+    public void sellCar() throws IOException {
+        outputToClient.println("Enter REG:");
+        String message = inputFromClient.readLine();
+
+        if (inventory.containsKey(message)) {
+            inventory.remove(message);
+        }
+
+        outputToClient.println(message.toUpperCase() + " $OLD!");
     }
 
     public void carInfo() throws IOException {
