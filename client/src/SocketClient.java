@@ -24,17 +24,28 @@ public class SocketClient {
 
         Scanner scanner = new Scanner(System.in);
         String toServer = "";
+        String responseFromServer;
+
+        showMenu();
 
         while (!"stop".equalsIgnoreCase(toServer)) {
             toServer = scanner.nextLine();
-            System.out.println("Send to server: " + toServer);
+            System.out.println("Send this to server: " + toServer);
             outputToServer.println(toServer);
-            String responseFromServer = inputFromServer.readLine();
-            System.out.println("Response from server: " + responseFromServer);
+            while ((responseFromServer = inputFromServer.readLine()) != null) {
+                System.out.println("Response from server: " + responseFromServer);
+                break;
+            }
         }
+
 
         inputFromServer.close();
         outputToServer.close();
         clientSocket.close();
+    }
+
+    public static void showMenu() {
+        System.out.println("** Menu **");
+        System.out.println("1. Add Car\n2. Sell Car\n3. Car Information");
     }
 }
