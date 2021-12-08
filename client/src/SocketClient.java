@@ -27,13 +27,15 @@ public class SocketClient {
         String responseFromServer;
 
         showMenu();
+        System.out.println();
 
         while (!"stop".equalsIgnoreCase(toServer)) {
             toServer = scanner.nextLine();
-            System.out.println("Send this to server: " + toServer);
+            System.out.println("CLIENT: " + toServer);
             outputToServer.println(toServer);
+
             while ((responseFromServer = inputFromServer.readLine()) != null) {
-                System.out.println("Response from server: " + responseFromServer);
+                System.out.println("SERVER: " + responseFromServer);
                 break;
             }
         }
