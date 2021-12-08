@@ -13,7 +13,7 @@ public class SocketServer {
     private PrintWriter outputToClient;
     private BufferedReader inputFromClient;
 
-    private static ArrayList<Car> carInventory;
+    Map<String, Car> inventory = new HashMap<>();
 
     public static void main(String[] args) throws IOException {
         serverSocket = new ServerSocket(PORT);
@@ -30,64 +30,69 @@ public class SocketServer {
     }
 
     public void startServer(ServerSocket serverSocket) throws IOException {
-        System.out.println("Start socket server BEGIN");
+        System.out.println("==== SERVER START ====");
 
-        carInventory = new ArrayList<>();
+
+        Car nissan = new Car("12D-54621", "Nissan", 17500, 5000, true);
+        Car toyota = new Car("15G-45674", "Toyota", 25000, 100, true);
+
+        inventory.put(nissan.getRegistration(), nissan);
+        inventory.put(toyota.getRegistration(), toyota);
 
         clientSocket = serverSocket.accept();
         outputToClient = new PrintWriter(clientSocket.getOutputStream(), true);
         inputFromClient = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 
-        System.out.println("Connection established");
+        System.out.println("Connection Established");
 
         String message = "";
 
         while(!"stop".equalsIgnoreCase(message)) {
 
-            message = inputFromClient.toString();
+            message = inputFromClient.readLine();
+            System.out.println(message);
 
-            showMenu(message);
+            if (message.contains("add")) {
+                createCarMenu();
+            } else if (message.contains("sell")) {
+                sellCar();
+            } else if (message.contains("info")) {
+                carInfo();
+            }
 
-
-            outputToClient.println("You sent " + message);
         }
 
         inputFromClient.close();
         outputToClient.close();
         clientSocket.close();
         serverSocket.close();
-        System.out.println("Start socket server END");
+        System.out.println("==== SERVER CLOSE ====");
     }
 
-    public void addCar() {
-        System.out.println("Adding car");
+    public void createCarMenu() {
+        outputToClient.println("Add Car");
     }
 
     public void sellCar() {
-        System.out.println("Selling car");
+        outputToClient.println("Selling car");
     }
 
-    public void carInfo() {
-        System.out.println("Getting info...");
-    }
+    public void carInfo() throws IOException {
+        outputToClient.println("Enter REG:");
+        String message = inputFromClient.readLine();
+        String name = "", make = "", price = "", mileage = "", forSale = "";
 
-    public void showMenu(String option) {
-        outputToClient.println("** Menu **");
-        outputToClient.println("1. Add Car\n2. Sell Car\n3. Car Info");
-
-        switch (option) {
-            case "1":
-                addCar();
-                break;
-            case "2":
-                sellCar();
-                break;
-            case "3":
-                carInfo();
-                break;
-            case "0":
-                break;
+        if (inventory.containsKey(message)) {
+            for (String key : inventory.keySet()) {
+                name = key;
+                make = inventory.get(key).getMake();
+                price = Integer.toString(inventory.get(key).getPrice());
+                mileage = Integer.toString(inventory.get(key).getMileage());
+                forSale = Boolean.toString(inventory.get(key).isForSale());
+            }
         }
+        outputToClient.println(" | " + name + " - " + make + " - " + price + " - " + mileage + " - " + forSale + " | ");
+        System.out.println(message);
     }
 }
 
